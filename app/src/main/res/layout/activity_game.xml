@@ -46,8 +46,8 @@
         android:layout_width="60dp"
         android:layout_height="60dp"
         android:text="←"
-        app:layout_constraintEnd_toStartOf="@+id/buttonUp"
-        app:layout_constraintBottom_toTopOf="@+id/buttonDown"/>
+        app:layout_constraintEnd_toStartOf="@+id/buttonDown"
+        app:layout_constraintBottom_toBottomOf="@+id/buttonDown"/>
 
     <!-- Buton dreapta -->
     <Button
@@ -55,8 +55,8 @@
         android:layout_width="60dp"
         android:layout_height="60dp"
         android:text="→"
-        app:layout_constraintStart_toEndOf="@+id/buttonUp"
-        app:layout_constraintBottom_toTopOf="@+id/buttonDown"/>
+        app:layout_constraintStart_toEndOf="@+id/buttonDown"
+        app:layout_constraintBottom_toBottomOf="@+id/buttonDown"/>
 
     <Button
         android:id="@+id/settingButton"
