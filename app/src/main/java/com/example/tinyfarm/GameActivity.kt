@@ -1,17 +1,44 @@
 package com.example.tinyfarm
 
+import com.example.tinyfarm.game.CharacterController
+import com.example.tinyfarm.ui.GameView
+
+
+
 import android.annotation.SuppressLint
-import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
-import android.widget.Button
 import android.app.Dialog
-import android.view.View
+import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.MotionEvent
+import android.view.View
+import android.widget.Button
+import androidx.appcompat.app.AppCompatActivity
+
 
 
 class GameActivity : AppCompatActivity(){
-    private lateinit var character: CharacterActivity
 
+
+    //caracter versiune noua
+    private lateinit var gameView: GameView
+    private lateinit var characterController: CharacterController
+
+    private val moveHandler = Handler(Looper.getMainLooper())
+    private var moving = false
+    private var moveDir: CharacterController.Direction? = null
+
+
+
+
+    private val moveRunnable = object : Runnable {
+        override fun run() {
+            if (!moving || moveDir == null) return
+            gameView.controller.move(moveDir!!, 10f)
+            gameView.postInvalidateOnAnimation()
+            moveHandler.postDelayed(this, 16)
+        }
+    }
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?){
         super.onCreate(savedInstanceState)
@@ -21,34 +48,49 @@ class GameActivity : AppCompatActivity(){
                         or View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
                 )
         setContentView(R.layout.activity_game)
+        gameView=findViewById(R.id.gameView)
 
+
+
+        //buton setari
         val settingButton=findViewById<Button>(R.id.settingButton)
         settingButton.setOnClickListener {
             openSettingDialog()
         }
 
-        //caracter
-        character= CharacterActivity(this)
-        character.centerCharacter()
 
         val buttonUp = findViewById<Button>(R.id.buttonUp)
         val buttonDown = findViewById<Button>(R.id.buttonDown)
         val buttonLeft = findViewById<Button>(R.id.buttonLeft)
         val buttonRight = findViewById<Button>(R.id.buttonRight)
+
+        //versiune noua
         buttonUp.setOnTouchListener(moveListener { isPressed ->
-            if (isPressed) character.moveUpStart() else character.stopMoving()
+            if (isPressed) startMoving(CharacterController.Direction.UP) else stopMoving()
         })
         buttonDown.setOnTouchListener(moveListener { isPressed ->
-            if (isPressed) character.moveDownStart() else character.stopMoving()
+            if (isPressed) startMoving(CharacterController.Direction.DOWN) else stopMoving()
         })
         buttonLeft.setOnTouchListener(moveListener { isPressed ->
-            if (isPressed) character.moveLeftStart() else character.stopMoving()
+            if (isPressed) startMoving(CharacterController.Direction.LEFT) else stopMoving()
         })
         buttonRight.setOnTouchListener(moveListener { isPressed ->
-            if (isPressed) character.moveRightStart() else character.stopMoving()
+            if (isPressed) startMoving(CharacterController.Direction.RIGHT) else stopMoving()
         })
+
+    }
+    private fun startMoving(dir: CharacterController.Direction) {
+        moveDir = dir
+        if (moving) return
+        moving = true
+        moveHandler.post(moveRunnable)
     }
 
+    private fun stopMoving() {
+        moving = false
+        moveDir = null
+        moveHandler.removeCallbacks(moveRunnable)
+    }
 
 
     @SuppressLint("ClickableViewAccessibility")
